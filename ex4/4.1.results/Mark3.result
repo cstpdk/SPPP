@@ -1,0 +1,16 @@
+# OS:   Linux; 3.16.1-1-ARCH; amd64
+# JVM:  Oracle Corporation; 1.8.0_40-internal
+# Cores		: 4
+# model name	: Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+# cache size	: 4096 KB
+# Date: 2014-09-19T09:28:02+0000
+  29.7 ns
+  29.6 ns
+  28.5 ns
+  28.5 ns
+  28.5 ns
+  28.5 ns
+  28.5 ns
+  29.2 ns
+  29.0 ns
+  29.2 ns

@@ -1,0 +1,30 @@
+# OS:   Linux; 3.16.1-1-ARCH; amd64
+# JVM:  Oracle Corporation; 1.8.0_40-internal
+# Cores		: 4
+# model name	: Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+# cache size	: 4096 KB
+# Date: 2014-09-19T09:29:10+0000
+multiply                           1814.4 ns    3741.89          2
+multiply                            426.2 ns     197.41          4
+multiply                            471.2 ns     113.46          8
+multiply                            520.2 ns     289.45         16
+multiply                            257.7 ns     104.81         32
+multiply                             60.2 ns      18.63         64
+multiply                            107.3 ns      89.17        128
+multiply                             78.4 ns      16.15        256
+multiply                             76.1 ns       8.24        512
+multiply                             48.9 ns       7.64       1024
+multiply                             45.2 ns       0.87       2048
+multiply                             55.5 ns       7.80       4096
+multiply                             37.9 ns       7.62       8192
+multiply                             34.6 ns       0.60      16384
+multiply                             32.5 ns       1.39      32768
+multiply                             32.8 ns       2.49      65536
+multiply                             30.0 ns       0.37     131072
+multiply                             29.7 ns       0.22     262144
+multiply                             29.6 ns       0.30     524288
+multiply                             29.2 ns       0.47    1048576
+multiply                             30.7 ns       3.06    2097152
+multiply                             28.9 ns       0.27    4194304
+multiply                             28.7 ns       0.37    8388608
+multiply                             28.6 ns       0.10   16777216

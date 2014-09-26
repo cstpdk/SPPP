@@ -1,0 +1,286 @@
+Exercise 4
+
+
+See mac_specs.jpg
+
+# OS:   Mac OS X; 10.9.4; x86_64
+# JVM:  Oracle Corporation; 1.8.0_20
+# CPU:  null
+# Date: 2014-09-20T14:17:06+0200
+
+
+
+
+
+
+
+
+
+Mark 1 measurement:
+ 5,2 ns (dummy variable ignored here as expected)
+
+Mark2 measurement:
+32,0 ns 
+
+Mark 3 measurement:
+ 32,1 ns
+  32,0 ns
+  32,0 ns
+  31,3 ns (variations here probably because of other program
+  31,3 ns   activities)
+  31,3 ns
+  31,2 ns
+  31,3 ns
+  31,3 ns
+  32,0 ns
+
+Mark 4 measurement:
+31,8 ns +/-  0,245 (previsous variations shown here in std deviation)
+
+Mark 5 measurement: 
+ 523,1 ns +/-   921,31          2
+ 167,6 ns +/-    38,01          4
+ 147,3 ns +/-    41,46          8
+ 158,2 ns +/-   101,26         16
+6179,7 ns +/- 18381,61         32
+  44,2 ns +/-     7,49         64
+  78,9 ns +/-   111,04        128
+  41,5 ns +/-     1,75        256
+  37,2 ns +/-     0,76        512
+  36,9 ns +/-     0,42       1024
+  37,0 ns +/-     0,49       2048
+  37,3 ns +/-     0,50       4096
+  34,4 ns +/-     1,23       8192
+  34,2 ns +/-     0,31      16384
+  33,4 ns +/-     2,65      32768
+  34,2 ns +/-     1,91      65536
+  32,4 ns +/-     0,78     131072
+  32,1 ns +/-     0,71     262144
+  32,1 ns +/-     0,37     524288
+  32,0 ns +/-     1,14    1048576
+  31,3 ns +/-     0,32    2097152
+  31,7 ns +/-     0,46    4194304
+  31,8 ns +/-     0,38    8388608
+
+Mark 6 measurement:			
+multiply                           1172,9 ns    2290,44          2
+multiply                            385,4 ns     120,05          4
+multiply                            349,3 ns      73,37          8
+multiply                            368,8 ns     169,66         16
+multiply                            238,2 ns     127,58         32
+multiply                             82,3 ns      17,13         64
+multiply                             86,5 ns      67,17        128
+multiply                             65,0 ns      45,40        256
+multiply                             49,2 ns       6,35        512
+multiply                             43,5 ns       0,46       1024
+multiply                             43,5 ns       0,90       2048
+multiply                             43,6 ns       2,16       4096
+multiply                             34,8 ns       2,74       8192
+multiply                             34,3 ns       0,94      16384
+multiply                             33,4 ns       2,12      32768
+multiply                             34,7 ns       2,03      65536
+multiply                             32,7 ns       0,75     131072
+multiply                             32,3 ns       0,62     262144
+multiply                             32,5 ns       0,80     524288
+multiply                             32,5 ns       1,53    1048576
+multiply                             31,2 ns       0,31    2097152
+multiply                             31,2 ns       0,23    4194304
+multiply                             31,4 ns       0,53    8388608
+
+Comment on 4.1 part 1:
+Results are plausable. Same processer as used in article (probably also same type of hardware besides the cpu as i’m on mackbook pro).
+
+4.1 Part 2:
+Tests performed on my own computer: (se previously mentioned specs)
+# OS:   Mac OS X; 10.9.4; x86_64
+# JVM:  Oracle Corporation; 1.8.0_20
+# CPU:  null
+# Date: 2014-09-20T19:37:00+0200
+pow                                  75,3 ns       0,21    4194304
+exp                                  53,5 ns       0,07    8388608
+log                                  32,6 ns       0,14    8388608
+sin                                 120,5 ns       1,50    2097152
+cos                                 118,9 ns       0,17    4194304
+tan                                 152,9 ns       0,91    2097152
+asin                                235,6 ns       1,66    1048576
+acos                                230,0 ns       6,15    2097152
+atan                                 58,7 ns       1,88    8388608
+
+Tests performed on friends computer: 
+# OS:   Linux; 3.16.1-1-ARCH; amd64
+# JVM:  Oracle Corporation; 1.8.0_40-internal
+# Cores         : 4
+# model name    : Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+# cache size    : 4096 KB
+# Date: 2014-09-24T08:28:57+0000
+pow                                  71.7 ns       0.27    4194304
+exp                                  51.7 ns       0.17    8388608
+log                                  22.7 ns       0.24   16777216
+sin                                 115.9 ns       0.67    4194304
+cos                                 115.0 ns       0.81    4194304
+tan                                 143.4 ns       0.80    2097152
+asin                                221.2 ns       2.76    2097152
+acos                                211.8 ns       4.93    2097152
+atan                                 44.0 ns       0.87    8388608
+
+
+Test performed by Sestoft in paper:
+
+pow 76.0 0.57 4194304
+exp 55.0 0.41 8388608
+log 31.9 0.55 8388608
+sin 116.1 0.61 4194304
+cos 116.1 0.49 4194304
+tan 143.4 1.40 2097152
+asin 232.1 2.70 2097152
+acos 216.4 2.30 2097152
+atan 54.1 0.27 8388608
+
+
+
+Comments:
+Some functions deviate a lot from the “slides” version. Don’t know what to say about that besides my computer doing other stuff that takes up process cycles.
+
+Test performed on friends computer is consistently better, despite a slightly worse CPU (and him running spotify while doing the tests). Both of us have quite a large standard deviation on the longer running operations (asin and acos), this suggest that longer running operations generally gives less clear results.
+
+
+
+Exercise 4.2
+4.2 Part 1)
+hashCode()                          920,4 ns    1743,60          2
+hashCode()                          368,4 ns     156,40          4
+hashCode()                          874,0 ns    1696,59          8
+hashCode()                          316,2 ns     248,02         16
+hashCode()                          174,3 ns     141,14         32
+hashCode()                          105,1 ns      24,22         64
+hashCode()                         1603,8 ns    4409,37        128
+hashCode()                          124,5 ns      22,87        256
+Thread's work                      6813,9 ns      77,47      32768
+Thread's work                      6807,3 ns      62,41      65536
+Thread create                     78471,9 ns  213543,90          2
+Thread create                      7641,8 ns    1181,73          4
+Thread create                      7509,9 ns     908,03          8
+
+Deviations here again probably because of other activities taking priority in task scheduler. 
+
+4.2 Part 2)
+# OS:   Mac OS X; 10.9.4; x86_64
+# JVM:  Oracle Corporation; 1.8.0_20
+# CPU:  null
+# Date: 2014-09-20T19:59:08+0200
+hashCode()                            2,8 ns       0,04  134217728
+Point creation                       79,1 ns       0,74    4194304
+Thread's work                      6805,1 ns      27,11      65536
+Thread create                      1231,1 ns      20,50     262144
+Thread create start               51425,7 ns     191,74       8192
+Thread create start join          75682,0 ns     833,37       4096
+ai value = 1556420000
+Uncontended lock                      5,1 ns       0,10   67108864
+
+Relatively small deviation in the threads work and creation.
+A lot of time is spent on joining and this part shows a large deviation time which is to be expected as threads just don’t finish at the same time. 
+
+Exercise 4.3
+countParallel      1              12281,0 us     406,88         32
+countParallel      2               7296,5 us     111,17         64
+countParallel      3               5275,6 us      93,39         64
+countParallel      4               5076,0 us     143,94         64
+countParallel      5               4589,2 us      65,67         64
+countParallel      6               4023,9 us      41,58         64
+countParallel      7               3645,2 us      26,32        128
+countParallel      8               3503,8 us      22,77        128
+countParallel      9               3594,6 us      20,62        128
+countParallel     10               3567,4 us      37,14        128
+countParallel     11               3574,9 us      24,94        128
+countParallel     12               3649,2 us      32,47        128
+countParallel     13               3606,7 us      16,82        128
+countParallel     14               3439,6 us      23,65        128
+countParallel     15               3363,8 us      15,34        128
+countParallel     16               3389,5 us       8,36        128
+countParallel     17               3336,4 us      14,80        128
+countParallel     18               3339,9 us       4,76        128
+countParallel     19               3399,8 us      45,45        128
+countParallel     20               3443,3 us      15,41        128
+countParallel     21               3434,7 us      33,61        128
+countParallel     22               3380,2 us       7,77        128
+countParallel     23               3368,7 us      14,90        128
+countParallel     24               3388,3 us      11,84        128
+countParallel     25               3389,1 us      21,32        128
+countParallel     26               3359,9 us      21,83        128
+countParallel     27               3350,9 us      12,83        128
+countParallel     28               3422,6 us      24,14        128
+countParallel     29               3421,4 us      20,39        128
+countParallel     30               3414,9 us      15,53        128
+countParallel     31               3422,3 us      13,95        128
+countParallel     32               3433,0 us      22,31        128
+
+Part 2)
+
+See Graph1.jpg
+
+Part 3)
+Comments:
+Lowest time around 8 cores. Sounds reasonable. No further improvements after that. Actually surprising that there’s not any substantial overhead in adding so many threads. 
+ If we start at 64 threads instead the results are similar:
+64 threads 4261
+65 threads 4240
+66 threads 4318
+67 threads 4359
+Can’t explain that at the moment I would assume a rise in time with so many threads. 
+
+
+part 4) Using the built in Atomic long class:
+1 Threads 11821
+2 Threads 7024
+3 Threads 5247
+4 Threads 4687
+5 Threads 4197
+6 Threads 3627
+7 Threads 3246
+8 Threads 3111
+9 Threads 3201
+10 Threads 3206
+11 Threads 3183
+12 Threads 3232
+
+Comments: The execution times here are a bit lower which may be caused by some compiler/jvm optimizations for the built in atomic class. If such classes exist I think you should use them. (saves programming time if not execution time).
+
+Part 5) Minimizing synchronized calls.
+1 Threads 12885
+2 Threads 7770
+3 Threads 5611
+4 Threads 5041
+5 Threads 4545
+6 Threads 3921
+7 Threads 3524
+8 Threads 3440
+9 Threads 3465
+This does not seem to make it any faster.
+
+Can’t explain that, other than the waiting time is not very substantial.
+
+Exercise 4.4
+Part 1)
+Time measured using Memoizer1:
+TestCache                    1808674250,0 ns 27408499,08          2
+
+Time measured using Memoizer2:
+TestCache                    1028110459,9 ns 33308154,42          2
+
+Time measured using Memoizer3:
+TestCache                     849843004,3 ns 12717886,54          2
+Time measured using Memoizer4:
+TestCache                     832739098,5 ns 13085555,31          2
+Time measured using Memoizer5:
+TestCache                     832964706,7 ns 12211653,68          2
+
+
+See Graph2.jpg
+
+Comments.
+Better parallelism in memoizer 2 drastically improves execution times.
+Memoizer 3 registers in cache immediately and probably saves some cpu cycles for unnecessary calculations.
+Memoizer 4 and 5 are just variations with little improvements. 
+
+
+

@@ -78,7 +78,7 @@ class LongCounter {
   public synchronized void increment() {
     count = count + 1;
   }
-  public synchronized long get() { 
-    return count; 
+  public long get() {
+    return count;
   }
 }

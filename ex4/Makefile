@@ -10,7 +10,7 @@ mark41results := $(marks41:%=%.result)
 
 .PHONY: .run-* print-results
 
-default: run-4.2
+default: MathFunctionBenchmarks.result
 
 %.class: $(SOURCES)
 	javac $(@:.class=.java)
@@ -27,6 +27,8 @@ run-4.1: Benchmark.class $(mark41results)
 run-4.2: TestTimeThreads.class
 	#$(JAVA) TestTimeThreads | tee 4.2.mark6.result
 	$(JAVA) TestTimeThreads | tee 4.2.mark7.result
+
+run-4.3: TestCountPrimesThreads.class
 
 answers.pdf: answers.md
 	pandoc -o answers.pdf answers.md

@@ -1,3 +1,0 @@
-Cores		: 4
-model name	: Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
-cache size	: 4096 KB

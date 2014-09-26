@@ -8,4 +8,4 @@ build:
 	docker build -t sppp .
 
 $(exercises):
-	docker run -it -v $(shell pwd)/$@:/app --entrypoint make sppp default
+	docker run -u 1000 -it -v $(shell pwd)/$@:/app --entrypoint make sppp default

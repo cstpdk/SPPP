@@ -15,5 +15,8 @@ default: run-6.1
 run-6.1: src/TestAccountDeadlock.class
 	(cd src && java TestAccountDeadlock)
 
+run-6.2: src/TestAccountLockOrder.class
+	(cd src && java TestAccountLockOrder)
+
 clean:
 	rm -f *.class

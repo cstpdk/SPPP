@@ -38,13 +38,13 @@ public class TestAccountLockOrder {
     Thread clerk1 = new Thread(new Runnable() {
         public void run() { 
           for (int i=0; i<transfers; i++) 
-            account1.transferD(account2, rnd.nextInt(10000));
+            account1.transferTieLock(account2, rnd.nextInt(10000));
         }
       });
     Thread clerk2 = new Thread(new Runnable() {
         public void run() { 
           for (int i=0; i<transfers; i++) 
-            account2.transferD(account1, rnd.nextInt(10000));
+            account2.transferTieLock(account1, rnd.nextInt(10000));
         }
       });
     clerk1.start(); clerk2.start();
@@ -53,11 +53,11 @@ public class TestAccountLockOrder {
       try { Thread.sleep(10); } catch (InterruptedException exn) { }
       // Locking both accounts is necessary to avoid reading the
       // balance in the middle of a transfer.
-      System.out.println(Account.balanceSumD(account1, account2));
+      System.out.println(Account.balanceSumE(account1, account2));
     }
     // The auditor prints the account balance sum when the clerks are finished: 
     try { clerk1.join(); clerk2.join(); } catch (InterruptedException exn) { }
-    System.out.println("\nFinal sum is " + Account.balanceSumD(account1, account2));
+    System.out.println("\nFinal sum is " + Account.balanceSumE(account1, account2));
   }
 }
 
@@ -119,6 +119,32 @@ class Account {
           ac1.balance = ac1.balance - amount;
           ac2.balance = ac2.balance + amount;
         } }
+  }
+
+  private final static Object thaiLock = new Object();
+  // This is thread-safe but may deadlock; takes the locks in the
+  // order determined by the Account object's hashCode.  May deadlock
+  // in (the rare) case distinct objects get identical hashcodes; this
+  // case may be handled using a third lock, as in Goetz p. 209.
+  public void transferTieLock(Account that, final long amount) {
+    Account ac1 = this, ac2 = that;
+    if (System.identityHashCode(ac1) < System.identityHashCode(ac2))
+      synchronized (ac1) { synchronized (ac2) { // ac1 <= ac2
+          ac1.balance = ac1.balance - amount;
+          ac2.balance = ac2.balance + amount;
+        } }
+    else if(System.identityHashCode(ac1) > System.identityHashCode(ac2))
+      synchronized (ac2) { synchronized (ac1) { // ac2 < ac1
+          ac1.balance = ac1.balance - amount;
+          ac2.balance = ac2.balance + amount;
+        } } else{
+          synchronized(thaiLock){
+             synchronized (ac1) { synchronized (ac2) { // fallback for ac2 == ac1
+              ac1.balance = ac1.balance - amount;
+              ac2.balance = ac2.balance + amount;
+            } }
+          }
+        }
   }
 
   public static long balanceSumE(Account ac1, Account ac2) {

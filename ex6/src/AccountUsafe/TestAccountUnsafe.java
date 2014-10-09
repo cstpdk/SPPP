@@ -10,6 +10,7 @@
 // TransferB: Updates each account atomically but not does not make
 // the transfer atomically, so allows observations ("audits") in the
 // middle of a transfer, where the account balances do not sum to 5000.
+package AccountUsafe;
 
 import java.util.Random;
 

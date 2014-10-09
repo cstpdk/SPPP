@@ -8,6 +8,7 @@
 
 // TransferC: Locks both accounts to make the transfer atomic, but
 // does not take locks in consistent order and so may deadlock.
+package TestAccountDeadlock;
 
 import java.util.Random;
 

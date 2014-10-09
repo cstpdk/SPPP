@@ -75,4 +75,8 @@ can appear, as argued above, but we only got a single deadlock, despite trying e
 
 So, it tells us that 4 threads are all waiting to lock. 
 
-2.4. 
+2.4. This doesn't deadlock
+
+2.5. Yes, plenty of philosophers are eating.
+
+2.6. 

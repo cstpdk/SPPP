@@ -79,4 +79,26 @@ So, it tells us that 4 threads are all waiting to lock.
 
 2.5. Yes, plenty of philosophers are eating.
 
-2.6. 
+2.6. This seems quite fair, this is of course not
+guaranteed, rather it is a coincidence by virtue of the java thread scheduler.
+
+output:
+	Philosopher 0, have eaten 5501 times
+	Philosopher 1, have eaten 5453 times
+	Philosopher 2, have eaten 5548 times
+	Philosopher 3, have eaten 5506 times
+	Philosopher 4, have eaten 5530 times
+
+4.1. Apparently it does not. It has no warning or error to report. when both increment
+and getCount is synchronized. It does not expect getSpan to be syncronized.
+
+4.2. So threadsafe doesn't complain even without locks. It seems logical to
+lock on both of the histograms as it is a read from the one and a write from
+the other. If we don't lock anything we risk that the data read is inconsistent
+before it is written. So to avoid this, we lock both histograms. However, doing so,
+puts us at risk of deadlocking, but threadsafe apparently does not find this risk
+to exist.
+
+4.3. Basically it says that we're not consistent about hte use of the synchronized keyword.
+Adding a synchronized on both elements actually makes it skip the error, although the deadlock
+risk, as mentioned, might occur.

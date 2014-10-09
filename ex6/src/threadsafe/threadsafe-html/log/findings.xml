@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<findings>
+  <finding type="CCE_SL_INCONSISTENT_COL">
+    <locations>
+      <field className="Histogram2" name="counts" type="[I" key="0" filename="SimpleHistogram.java" line="35"/>
+      <instruction className="bin.Histogram2" method="increment" offset="6" desc="(I)V" key="1" label="relevant_sync_read" filename="SimpleHistogram.java" line="42"/>
+      <instruction className="bin.Histogram2" method="getCount" offset="3" desc="(I)I" key="2" label="relevant_sync_read" filename="SimpleHistogram.java" line="45"/>
+      <instruction className="Histogram2" method="increment" offset="6" desc="(I)V" key="3" label="relevant_sync_read" filename="SimpleHistogram.java" line="55"/>
+      <instruction className="Histogram2" method="getCount" offset="3" desc="(I)I" key="4" label="relevant_sync_read" filename="SimpleHistogram.java" line="58"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="22" desc="(LHistogram2;)V" key="5" label="relevant_unsync_read" filename="SimpleHistogram.java" line="74"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="28" desc="(LHistogram2;)V" key="6" label="relevant_unsync_read" filename="SimpleHistogram.java" line="75"/>
+      <instruction className="bin.Histogram2" method="increment" offset="9" desc="(I)V" key="7" label="relevant_sync_write" filename="SimpleHistogram.java" line="42"/>
+      <instruction className="Histogram2" method="increment" offset="9" desc="(I)V" key="8" label="relevant_sync_write" filename="SimpleHistogram.java" line="55"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="31" desc="(LHistogram2;)V" key="9" label="relevant_unsync_write" filename="SimpleHistogram.java" line="75"/>
+      <class name="Histogram2" key="10" label="guard_type" filename="SimpleHistogram.java"/>
+    </locations>
+    <info>
+      <message value="Accesses to the collection in field 'counts' are inconsistently synchronized.">
+        <location key="0" message="Problem location"/>
+        <location key="1" message="Synchronized read"/>
+        <location key="2" message="Synchronized read"/>
+        <location key="3" message="Synchronized read"/>
+        <location key="4" message="Synchronized read"/>
+        <location key="5" message="Unsynchronized read"/>
+        <location key="6" message="Unsynchronized read"/>
+        <location key="7" message="Synchronized write"/>
+        <location key="8" message="Synchronized write"/>
+        <location key="9" message="Unsynchronized write"/>
+        <location key="10"/>
+      </message>
+      <guards>
+        <guardRelative typeRef="10" key="0" intrinsic="true">
+          <guardPath/>
+          <targetPath/>
+        </guardRelative>
+      </guards>
+      <accesses>
+        <access location="1" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="2" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="3" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="4" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="5" type="relevant_unsync_read">
+          <accessGuards/>
+        </access>
+        <access location="6" type="relevant_unsync_read">
+          <accessGuards/>
+        </access>
+        <access location="7" type="relevant_sync_write">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="8" type="relevant_sync_write">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="9" type="relevant_unsync_write">
+          <accessGuards/>
+        </access>
+      </accesses>
+    </info>
+  </finding>
+  <finding type="CCE_RA_GUARDED_BY_VIOLATED">
+    <locations>
+      <field className="Histogram2" name="counts" type="[I" key="0" filename="SimpleHistogram.java" line="35"/>
+      <instruction className="bin.Histogram2" method="increment" offset="6" desc="(I)V" key="1" label="relevant_sync_read" filename="SimpleHistogram.java" line="42"/>
+      <instruction className="bin.Histogram2" method="getCount" offset="3" desc="(I)I" key="2" label="relevant_sync_read" filename="SimpleHistogram.java" line="45"/>
+      <instruction className="Histogram2" method="increment" offset="6" desc="(I)V" key="3" label="relevant_sync_read" filename="SimpleHistogram.java" line="55"/>
+      <instruction className="Histogram2" method="getCount" offset="3" desc="(I)I" key="4" label="relevant_sync_read" filename="SimpleHistogram.java" line="58"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="22" desc="(LHistogram2;)V" key="5" label="relevant_unsync_read" filename="SimpleHistogram.java" line="74"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="28" desc="(LHistogram2;)V" key="6" label="relevant_unsync_read" filename="SimpleHistogram.java" line="75"/>
+      <instruction className="bin.Histogram2" method="increment" offset="9" desc="(I)V" key="7" label="relevant_sync_write" filename="SimpleHistogram.java" line="42"/>
+      <instruction className="Histogram2" method="increment" offset="9" desc="(I)V" key="8" label="relevant_sync_write" filename="SimpleHistogram.java" line="55"/>
+      <instruction className="bin.Histogram2" method="addAll2" offset="31" desc="(LHistogram2;)V" key="9" label="relevant_unsync_write" filename="SimpleHistogram.java" line="75"/>
+      <class name="Histogram2" key="10" label="guard_type" filename="SimpleHistogram.java"/>
+    </locations>
+    <info>
+      <message value="@GuardedBy annotation on field 'counts' violated">
+        <location key="0" message="Problem location"/>
+        <location key="1" message="Synchronized read"/>
+        <location key="2" message="Synchronized read"/>
+        <location key="3" message="Synchronized read"/>
+        <location key="4" message="Synchronized read"/>
+        <location key="5" message="Unsynchronized read"/>
+        <location key="6" message="Unsynchronized read"/>
+        <location key="7" message="Synchronized write"/>
+        <location key="8" message="Synchronized write"/>
+        <location key="9" message="Unsynchronized write"/>
+        <location key="10"/>
+      </message>
+      <guards>
+        <guardRelative typeRef="10" key="0" intrinsic="true">
+          <guardPath/>
+          <targetPath/>
+        </guardRelative>
+      </guards>
+      <accesses>
+        <access location="1" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="2" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="3" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="4" type="relevant_sync_read">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="5" type="relevant_unsync_read">
+          <accessGuards/>
+        </access>
+        <access location="6" type="relevant_unsync_read">
+          <accessGuards/>
+        </access>
+        <access location="7" type="relevant_sync_write">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="8" type="relevant_sync_write">
+          <accessGuards>
+            <guardRef key="0" status="always"/>
+          </accessGuards>
+        </access>
+        <access location="9" type="relevant_unsync_write">
+          <accessGuards/>
+        </access>
+      </accesses>
+    </info>
+  </finding>
+</findings>

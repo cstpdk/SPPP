@@ -76,3 +76,8 @@ can appear, as argued above, but we only got a single deadlock, despite trying e
 So, it tells us that 4 threads are all waiting to lock. 
 
 2.4. 
+Philosopher 0, have eaten 5501 times 
+Philosopher 1, have eaten 5453 times 
+Philosopher 2, have eaten 5548 times 
+Philosopher 3, have eaten 5506 times 
+Philosopher 4, have eaten 5530 times 

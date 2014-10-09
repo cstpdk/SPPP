@@ -1,3 +1,25 @@
-1. Yes it deadlocks
+1.1. Yes it deadlocks
 
-2. 
+1.2. No it does not deadlock. The likelihood of this happening
+is quite low, so it's not really expected to happen.
+
+1.3. This flies like no other, without deadlocking.
+
+1.4. Yes, that would be very safe, but it would not be very fast and not
+really in the spirit of concurrency. It would require the same lock
+to be had for all transfers, resulting in serialized execution.
+
+2.1. This may deadlock because multiple threads lock on the same
+ressource, and it is therefore very likely that two threads will wait
+for the same resource at the same time. Formally, the program satisifes the
+four deadlock conditions:
+
+- Mutual exclusion, as only one resource is held to stop execution
+- Hold and wait, as there is a process that can wait while the resource is held
+- No preemption, Resources cannot be forcefully taken away
+- Circular wait, as there are several processes that can wait for each other.
+
+2.2. This deadlocks and is not really surprising, as deadlocks
+can appear, as argued above.
+
+

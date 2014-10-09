@@ -20,55 +20,59 @@ four deadlock conditions:
 - Circular wait, as there are several processes that can wait for each other.
 
 2.2. This deadlocks and is not really surprising, as deadlocks
-can appear, as argued above.
+can appear, as argued above, but we only got a single deadlock, despite trying excessively
 
-THREAD DUMP:
-Found one Java-level deadlock:
-=============================
-"Thread-4":
-  waiting to lock monitor 0x00007fd8838050b8 (object 0x000000076abecae0, a Fork),
-  which is held by "Thread-0"
-"Thread-0":
-  waiting to lock monitor 0x00007fd8838079f8 (object 0x000000076abecaf0, a Fork),
-  which is held by "Thread-1"
-"Thread-1":
-  waiting to lock monitor 0x00007fd883807948 (object 0x000000076abecb00, a Fork),
-  which is held by "Thread-2"
-"Thread-2":
-  waiting to lock monitor 0x00007fd88308e6a8 (object 0x000000076abecb10, a Fork),
-  which is held by "Thread-3"
-"Thread-3":
-  waiting to lock monitor 0x00007fd88308e5f8 (object 0x000000076abecb20, a Fork),
-  which is held by "Thread-4"
+2.3. This is the dump from jvisualvm
 
-Java stack information for the threads listed above:
-===================================================
-"Thread-4":
-	at Philosopher.run(TestPhilosophers.java:43)
-	- waiting to lock <0x000000076abecae0> (a Fork)
-	- locked <0x000000076abecb20> (a Fork)
-	at java.lang.Thread.run(Thread.java:745)
-"Thread-0":
-	at Philosopher.run(TestPhilosophers.java:43)
-	- waiting to lock <0x000000076abecaf0> (a Fork)
-	- locked <0x000000076abecae0> (a Fork)
-	at java.lang.Thread.run(Thread.java:745)
-"Thread-1":
-	at Philosopher.run(TestPhilosophers.java:43)
-	- waiting to lock <0x000000076abecb00> (a Fork)
-	- locked <0x000000076abecaf0> (a Fork)
-	at java.lang.Thread.run(Thread.java:745)
-"Thread-2":
-	at Philosopher.run(TestPhilosophers.java:43)
-	- waiting to lock <0x000000076abecb10> (a Fork)
-	- locked <0x000000076abecb00> (a Fork)
-	at java.lang.Thread.run(Thread.java:745)
-"Thread-3":
-	at Philosopher.run(TestPhilosophers.java:43)
-	- waiting to lock <0x000000076abecb20> (a Fork)
-	- locked <0x000000076abecb10> (a Fork)
-	at java.lang.Thread.run(Thread.java:745)
+	THREAD DUMP:
+	Found one Java-level deadlock:
+	=============================
+	"Thread-4":
+	  waiting to lock monitor 0x00007fd8838050b8 (object 0x000000076abecae0, a Fork),
+	  which is held by "Thread-0"
+	"Thread-0":
+	  waiting to lock monitor 0x00007fd8838079f8 (object 0x000000076abecaf0, a Fork),
+	  which is held by "Thread-1"
+	"Thread-1":
+	  waiting to lock monitor 0x00007fd883807948 (object 0x000000076abecb00, a Fork),
+	  which is held by "Thread-2"
+	"Thread-2":
+	  waiting to lock monitor 0x00007fd88308e6a8 (object 0x000000076abecb10, a Fork),
+	  which is held by "Thread-3"
+	"Thread-3":
+	  waiting to lock monitor 0x00007fd88308e5f8 (object 0x000000076abecb20, a Fork),
+	  which is held by "Thread-4"
+	
+	Java stack information for the threads listed above:
+	===================================================
+	"Thread-4":
+		at Philosopher.run(TestPhilosophers.java:43)
+		- waiting to lock <0x000000076abecae0> (a Fork)
+		- locked <0x000000076abecb20> (a Fork)
+		at java.lang.Thread.run(Thread.java:745)
+	"Thread-0":
+		at Philosopher.run(TestPhilosophers.java:43)
+		- waiting to lock <0x000000076abecaf0> (a Fork)
+		- locked <0x000000076abecae0> (a Fork)
+		at java.lang.Thread.run(Thread.java:745)
+	"Thread-1":
+		at Philosopher.run(TestPhilosophers.java:43)
+		- waiting to lock <0x000000076abecb00> (a Fork)
+		- locked <0x000000076abecaf0> (a Fork)
+		at java.lang.Thread.run(Thread.java:745)
+	"Thread-2":
+		at Philosopher.run(TestPhilosophers.java:43)
+		- waiting to lock <0x000000076abecb10> (a Fork)
+		- locked <0x000000076abecb00> (a Fork)
+		at java.lang.Thread.run(Thread.java:745)
+	"Thread-3":
+		at Philosopher.run(TestPhilosophers.java:43)
+		- waiting to lock <0x000000076abecb20> (a Fork)
+		- locked <0x000000076abecb10> (a Fork)
+		at java.lang.Thread.run(Thread.java:745)
+	
+	Found 1 deadlock.
 
-Found 1 deadlock.
+So, it tells us that 4 threads are all waiting to lock. 
 
-
+2.4. 

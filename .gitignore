@@ -4,3 +4,5 @@ bin/
 *.pdf
 *.class
 .classpath
+.class
+

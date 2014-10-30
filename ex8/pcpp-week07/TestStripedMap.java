@@ -168,7 +168,7 @@ public class TestStripedMap {
   private static void testAllMaps() {
     testMap(new SynchronizedMap<Integer,String>(25));
     testMap(new StripedMap<Integer,String>(25, 5));
-    testMap(new StripedWriteMap<Integer,String>(25, 5));
+    //testMap(new StripedWriteMap<Integer,String>(25, 5));
     //testMap(new WrapConcurrentHashMap<Integer,String>());
   }
 

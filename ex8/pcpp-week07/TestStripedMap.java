@@ -25,22 +25,22 @@ public class TestStripedMap {
       final int threadCount = t;
       Mark7(String.format("%-21s %d", "SynchronizedMap", threadCount),
           new IntToDouble() { public double call(int i) {
-            return timeMap(threadCount, 
+            return timeMap(threadCount,
                            new SynchronizedMap<Integer,String>(bucketCount));
           }});
       Mark7(String.format("%-21s %d", "StripedMap", threadCount),
           new IntToDouble() { public double call(int i) {
-            return timeMap(threadCount, 
+            return timeMap(threadCount,
                            new StripedMap<Integer,String>(bucketCount, lockCount));
           }});
       Mark7(String.format("%-21s %d", "StripedWriteMap", threadCount), 
           new IntToDouble() { public double call(int i) {
-            return timeMap(threadCount, 
+            return timeMap(threadCount,
                            new StripedWriteMap<Integer,String>(bucketCount, lockCount));
           }});
       Mark7(String.format("%-21s %d", "WrapConcHashMap", threadCount),
           new IntToDouble() { public double call(int i) {
-            return timeMap(threadCount, 
+            return timeMap(threadCount,
                            new WrapConcurrentHashMap<Integer,String>());
           }});
     }
@@ -65,7 +65,7 @@ public class TestStripedMap {
             // Add key with probability 60%
             if (random.nextDouble() < 0.60) 
               map.put(key, Integer.toString(key));
-          } 
+          }
           else // Remove key with probability 2% and reinsert
             if (random.nextDouble() < 0.02) {
               map.remove(key);
@@ -168,8 +168,8 @@ public class TestStripedMap {
   private static void testAllMaps() {
     testMap(new SynchronizedMap<Integer,String>(25));
     testMap(new StripedMap<Integer,String>(25, 5));
-    testMap(new StripedWriteMap<Integer,String>(25, 5));
-    testMap(new WrapConcurrentHashMap<Integer,String>());
+    //testMap(new StripedWriteMap<Integer,String>(25, 5));
+    //testMap(new WrapConcurrentHashMap<Integer,String>());
   }
 
   // --- Benchmarking infrastructure ---
@@ -448,7 +448,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
     return size;
   }
 
-  // Put v at key k, or update if already present 
+  // Put v at key k, or update if already present
   public V put(K k, V v) {
     final int h = getHash(k), stripe = h % lockCount;
     synchronized (locks[stripe]) {
@@ -500,7 +500,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
         // Now prev.next == null || k.equals(prev.next.k)
         if (prev.next != null) {  // Delete ItemNode prev.next
           V old = prev.next.v;
-          sizes[stripe]--; 
+          sizes[stripe]--;
           prev.next = prev.next.next;
           return old;
         } else
@@ -513,7 +513,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
   public void forEach(Consumer<K,V> consumer) {
     final ItemNode<K,V>[] bs = buckets;
 
-    for (int i ; i < lockCount ; i++){
+    for (int i = 0; i < lockCount ; i++){
       synchronized(locks[i]){
         int hash = i % buckets.length;
         ItemNode<K,V> node = bs[hash];

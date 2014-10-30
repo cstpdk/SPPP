@@ -14,7 +14,7 @@ default: run-7.1
 
 
 run-7.1: pcpp-week07/TestStripedMap.class pcpp-week07/IntToDouble.class pcpp-week07/Timer.class
-	(cd pcpp-week07 && $(JAVA) TestStripedMap)
+	(cd pcpp-week07 && java -ea TestStripedMap)
 
 clean:
 	rm -f *.class

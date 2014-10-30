@@ -645,11 +645,13 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   // Return value v associated with key k, or null
   public V get(K k) {
     // note that its not locked for reading
-    final int h = getHash(k), stripe = h % lockCount;
+	  final ItemNode<K,V>[] bs = buckets;
+      final int h = getHash(k), stripe = h % lockCount;
       final int hash = h % buckets.length;
-      ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
-      if (node != null)
-        return node.v;
+      final Holder<V> old = new Holder<V>();
+      boolean found = ItemNode.search(bs[hash], k, old);
+      if (found)
+        return old.get();
       else
         return null;
   }
@@ -684,10 +686,10 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     final int hash = h % buckets.length;
     final ItemNode<K,V> b1 = buckets[hash];
     final Holder<V> old = new Holder<V>();
-    final ItemNode<K,V> node = ItemNode.search(b1, k, old);
+    boolean found = ItemNode.search(b1, k, old);
 
-    if (node != null)
-      return node.v;
+    if (found)
+      return old.get();
     else {
       synchronized(locks[stripe]){
         buckets[hash] = new ItemNode<K,V>(k, v, b1);
@@ -695,7 +697,6 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
         return null;
       }
     }
-    return null;
   }
 
   // Remove and return the value
@@ -705,7 +706,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     synchronized (locks[stripe]) {
       final ItemNode<K,V>[] bs = buckets;
       final int hash = h % bs.length;
-      final ItemNode<K,V> bucket = bs[hash],
+      final ItemNode<K,V> bucket = bs[hash];
       final Holder<V> old = new Holder<V>();
       final ItemNode<K,V> node = ItemNode.delete(bucket, k, old);
       if (node == null)

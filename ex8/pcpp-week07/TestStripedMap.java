@@ -706,18 +706,12 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
       final int hash = h % bs.length;
       final ItemNode<K,V> bucket = bs[hash],
       final Holder<V> old = new Holder<V>();
-      final ItemNode<K,V> node = ItemNode.search(bucket, k, old);
+      final ItemNode<K,V> node = ItemNode.delete(bucket, k, old);
       if (node == null)
 		  return null;
-		  
-	  ItemNode.delete(node, k, old);
-      
-	  bs[hash] = new ItemNode<K,V>(k, v, newNode);
-      // Write for visibility; increment if k was not already in map
-      sizes.getAndAdd(stripe, removed ? -1 : 0);
-      return old.get();
+      sizes.getAndAdd(stripe, -1);
+      return old.get()
     }
-    return null;
   }
 
   // Iterate over the hashmap's entries one stripe at a time.  

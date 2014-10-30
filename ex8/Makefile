@@ -13,7 +13,7 @@ sources.txt:
 	echo $(SOURCES) > sources.txt
 
 %.class: $(SOURCES)
-	javac $(@:.class=.java)
+	cd `dirname $@` && javac `basename $(@:.class=.java)`
 
 all-classes: sources.txt
 	javac @sources.txt

@@ -644,8 +644,14 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
 
   // Return value v associated with key k, or null
   public V get(K k) {
-    // TO DO: IMPLEMENT
-    return null;
+    // note that its not locked for reading
+    final int h = getHash(k), stripe = h % lockCount;
+      final int hash = h % buckets.length;
+      ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
+      if (node != null)
+        return node.v;
+      else
+        return null;
   }
 
   public int size() {
@@ -694,6 +700,23 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   // Remove and return the value
   public V remove(K k) {
     // TO DO: IMPLEMENT
+    final int h = getHash(k), stripe = h % lockCount;
+    synchronized (locks[stripe]) {
+      final ItemNode<K,V>[] bs = buckets;
+      final int hash = h % bs.length;
+      final ItemNode<K,V> bucket = bs[hash],
+      final Holder<V> old = new Holder<V>();
+      final ItemNode<K,V> node = ItemNode.search(bucket, k, old);
+      if (node == null)
+		  return null;
+		  
+	  ItemNode.delete(node, k, old);
+      
+	  bs[hash] = new ItemNode<K,V>(k, v, newNode);
+      // Write for visibility; increment if k was not already in map
+      sizes.getAndAdd(stripe, removed ? -1 : 0);
+      return old.get();
+    }
     return null;
   }
 

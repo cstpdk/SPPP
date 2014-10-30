@@ -5,4 +5,4 @@ bin/
 *.class
 .classpath
 .class
-
+*.swp

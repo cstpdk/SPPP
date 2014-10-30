@@ -23,3 +23,6 @@ run-7.1: pcpp-week07/IntToDouble.class pcpp-week07/Timer.class pcpp-week07/TestS
 
 clean:
 	rm -f *.class
+
+run-8:
+	cd pcpp-week08 && java TestFetchWebGui

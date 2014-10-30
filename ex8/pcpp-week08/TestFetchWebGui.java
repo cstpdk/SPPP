@@ -5,6 +5,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // For the SwingWorker subclass
 import java.util.List;
@@ -128,6 +129,10 @@ public class TestFetchWebGui {
         textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         outerPanel.add(textArea, BorderLayout.WEST);
         // (1) Use a background thread, not the event thread, for work
+        // (2) Add a progress bar
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        outerPanel.add(progressBar, BorderLayout.SOUTH);
+		AtomicInteger count = new AtomicInteger(1);
         for (String url : urls) {
             if (isCancelled())
               break;
@@ -136,31 +141,35 @@ public class TestFetchWebGui {
                 public void actionPerformed(ActionEvent e) {
                   downloadTask.execute();
                 }});
+        	downloadTask.addPropertyChangeListener(new PropertyChangeListener() {
+            	public void propertyChange(PropertyChangeEvent e) {
+              		if ("progress".equals(e.getPropertyName())) {
+                		progressBar.setValue((100 * count.getAndIncrement())/urls.length);
+              		}
+					if(progressBar.getValue()>=100)
+						textArea.append("Done");
+				}
+			});
         }
-        // (2) Add a progress bar
-        JProgressBar progressBar = new JProgressBar(0, 100);
-        outerPanel.add(progressBar, BorderLayout.SOUTH);
-//        downloadTask.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent e) {
-//              if ("progress".equals(e.getPropertyName())) {
-//                progressBar.setValue((Integer)e.getNewValue());
-//              }}});
         // (3) Enable cancellation
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              cancelled = true;
+              if(!cancelled){
+			  	cancelled = true;
+			  	textArea.append("Cancelled");
+			  }
             }});
         frame.pack(); frame.setVisible(true);
   }
 
   private static final String[] urls = 
-  { "http://www.itu.dk"//, "http://www.di.ku.dk", "http://www.miele.de",
-//    "http://www.microsoft.com", "http://www.amazon.com", "http://www.dr.dk",
-//    "http://www.vg.no", "http://www.tv2.dk", "http://www.google.com",
-//    "http://www.ing.dk", "http://www.dtu.dk", "http://www.eb.dk", 
-//    "http://www.nytimes.com", "http://www.guardian.co.uk", "http://www.lemonde.fr",   
-//    "http://www.welt.de", "http://www.dn.se", "http://www.heise.de", "http://www.wsj.com", 
-//    "http://www.bbc.co.uk", "http://www.dsb.dk", "http://www.bmw.com", "https://www.cia.gov" 
+  { "http://www.itu.dk", "http://www.di.ku.dk", "http://www.miele.de",
+    "http://www.microsoft.com", "http://www.amazon.com", "http://www.dr.dk",
+    "http://www.vg.no", "http://www.tv2.dk", "http://www.google.com",
+    "http://www.ing.dk", "http://www.dtu.dk", "http://www.eb.dk", 
+    "http://www.nytimes.com", "http://www.guardian.co.uk", "http://www.lemonde.fr",   
+    "http://www.welt.de", "http://www.dn.se", "http://www.heise.de", "http://www.wsj.com", 
+    "http://www.bbc.co.uk", "http://www.dsb.dk", "http://www.bmw.com" 
   };
 
     
@@ -208,18 +217,27 @@ public class TestFetchWebGui {
         public String doInBackground() {
             StringBuilder sb = new StringBuilder();
             int count = 0;
-
+			if(cancelled)
+				return null;
 
             System.out.println("Fetching " + url);
             String page = getPage(url, 200),
               result = String.format("%-40s%7d%n", url, page.length());
-            System.out.println("Result received:")
-            // sb.append(result); // (1)
-            setProgress((100 * ++count) / urls.length); // (2)
-            publish(result); // (4)
+            System.out.println("Result received:");
 
-            return sb.toString();
+            return result;
         }
+
+		public void done(){
+			try { 
+				if(!cancelled){
+					textArea.append(get());
+        			setProgress(1); // (2)
+				}
+			} catch (InterruptedException exn) { }
+				catch (ExecutionException exn) { throw new RuntimeException(exn.getCause()); }
+				catch (CancellationException exn) { textArea.append("Cancelled"); }  // (3)
+		}
     }
   
    
@@ -234,7 +252,6 @@ public class TestFetchWebGui {
     // Called on a separate worker thread, not the event thread, and
     // hence cannot write to textArea.
     public String doInBackground() {
-      StringBuilder sb = new StringBuilder();
       int count = 0;
       for (String url : urls) {
         if (isCancelled())
@@ -244,9 +261,8 @@ public class TestFetchWebGui {
           result = String.format("%-40s%7d%n", url, page.length());
         // sb.append(result); // (1)
         setProgress((100 * ++count) / urls.length); // (2)
-        publish(result); // (4)
       }
-      return sb.toString();
+      return "";
     }
   
     // (4) Called on the event thread to process results previously
@@ -260,7 +276,8 @@ public class TestFetchWebGui {
     // Called in the event thread when done() has terminated, whether
     // by completing or by being cancelled.
     public void done() {
-      try { 
+      System.out.println("in done");
+	  try { 
         textArea.append(get());
         textArea.append("Done"); 
       } catch (InterruptedException exn) { }

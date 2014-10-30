@@ -684,17 +684,17 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     final int hash = h % buckets.length;
     final ItemNode<K,V> b1 = buckets[hash];
     final Holder<V> old = new Holder<V>();
-    //final ItemNode<K,V> node = ItemNode.search(b1, k, old);
+    final ItemNode<K,V> node = ItemNode.search(b1, k, old);
 
-    //if (node != null)
-    //  return node.v;
-    //else {
-    //  synchronized(locks[stripe]){
-    //    buckets[hash] = new ItemNode<K,V>(k, v, b1);
-    //    sizes.getAndIncrement(stripe);
-    //    return null;
-    //  }
-    //}
+    if (node != null)
+      return node.v;
+    else {
+      synchronized(locks[stripe]){
+        buckets[hash] = new ItemNode<K,V>(k, v, b1);
+        sizes.getAndIncrement(stripe);
+        return null;
+      }
+    }
     return null;
   }
 
@@ -711,7 +711,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
       if (node == null)
 		  return null;
       sizes.getAndAdd(stripe, -1);
-      return old.get()
+      return old.get();
     }
   }
 

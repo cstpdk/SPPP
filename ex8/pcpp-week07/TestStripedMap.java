@@ -236,7 +236,7 @@ interface OurMap<K,V> {
 class SynchronizedMap<K,V> implements OurMap<K,V>  {
   // Synchronization policy: 
   //   buckets[hash] and cachedSize are guarded by this
-  private ItemNode<K,V>[] buckets;
+  private itemnode<k,v>[] buckets;
   private int cachedSize;
 
   public SynchronizedMap(int bucketCount) {
@@ -663,7 +663,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
       final ItemNode<K,V>[] bs = buckets;
       final int hash = h % bs.length;
       final Holder<V> old = new Holder<V>();
-      final ItemNode<K,V> node = bs[hash], 
+      final ItemNode<K,V> node = bs[hash],
         newNode = ItemNode.delete(node, k, old);
       bs[hash] = new ItemNode<K,V>(k, v, newNode);
       // Write for visibility; increment if k was not already in map
@@ -674,11 +674,24 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
 
   // Put v at key k only if absent
   public V putIfAbsent(K k, V v) {
-    // TO DO: IMPLEMENT
-    return null;
+    final int h = getHash(k), stripe = h % lockCount;
+    final int hash = h % buckets.length;
+    final ItemNode<K,V> b1 = buckets[hash];
+    final Holder<V> old = new Holder<V>();
+    final ItemNode<K,V> node = ItemNode.search(b1, k, old);
+
+    if (node != null)
+      return node.v;
+    else {
+      synchronized(locks[stripe]){
+        buckets[hash] = new ItemNode<K,V>(k, v, b1);
+        sizes[stripe]++;
+        return null;
+      }
+    }
   }
 
-  // Remove and return the value at key k if any, else return null
+  // Remove and return the value
   public V remove(K k) {
     // TO DO: IMPLEMENT
     return null;

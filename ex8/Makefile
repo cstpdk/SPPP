@@ -1,20 +1,25 @@
 SHELL := bash
-JAVA := java -cp `pwd`
+JAVA := java -cp `pwd`:`pwd`/pcpp-week07
 
-SOURCES := $(shell find . -name "*.java") 
+SOURCES := $(shell find . -name "*.java")
 
 CLASSES := $(SOURCES:.java=.class)
 
-.PHONY: .run-* print-results
+.PHONY: all-classes
 
 default: run-7.1
 
+sources.txt:
+	echo $(SOURCES) > sources.txt
+
 %.class: $(SOURCES)
-	javac $(@:.class=.java)
+	cd `dirname $@` && javac `basename $(@:.class=.java)`
 
+all-classes: sources.txt
+	javac @sources.txt
 
-run-7.1: pcpp-week07/TestStripedMap.class pcpp-week07/IntToDouble.class pcpp-week07/Timer.class
-	(cd pcpp-week07 && java -ea TestStripedMap)
+run-7.1: pcpp-week07/IntToDouble.class pcpp-week07/Timer.class pcpp-week07/TestStripedMap.class
+	(cd pcpp-week07 && $(JAVA) -ea TestStripedMap)
 
 clean:
 	rm -f *.class

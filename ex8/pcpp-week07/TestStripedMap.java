@@ -406,9 +406,9 @@ class StripedMap<K,V> implements OurMap<K,V> {
       this.locks[stripe] = new Object();
   }
 
-  @SuppressWarnings("unchecked") 
+  @SuppressWarnings("unchecked")
   private static <K,V> ItemNode<K,V>[] makeBuckets(int size) {
-    // Java's @$#@?!! type system requires this unsafe cast    
+    // Java's @$#@?!! type system requires this unsafe cast
     return (ItemNode<K,V>[])new ItemNode[size];
   }
 
@@ -611,7 +611,7 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   private volatile ItemNode<K,V>[] buckets;
   private final int lockCount;
   private final Object[] locks;
-  private final AtomicIntegerArray sizes;  
+  private final AtomicIntegerArray sizes;
 
   public StripedWriteMap(int bucketCount, int lockCount) {
     if (bucketCount % lockCount != 0)
@@ -649,7 +649,10 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   }
 
   public int size() {
-    // TO DO: IMPLEMENT
+    int size = 0;
+    for (int stripe=0; stripe<lockCount; stripe++){
+      size += sizes.get(stripe);
+    }
     return 0;
   }
 

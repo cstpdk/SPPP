@@ -234,9 +234,9 @@ interface OurMap<K,V> {
 // to a synchronized version of HashMap<K,V>.
 
 class SynchronizedMap<K,V> implements OurMap<K,V>  {
-  // Synchronization policy: 
+  // Synchronization policy:
   //   buckets[hash] and cachedSize are guarded by this
-  private itemnode<k,v>[] buckets;
+  private ItemNode<K,V>[] buckets;
   private int cachedSize;
 
   public SynchronizedMap(int bucketCount) {
@@ -678,17 +678,18 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
     final int hash = h % buckets.length;
     final ItemNode<K,V> b1 = buckets[hash];
     final Holder<V> old = new Holder<V>();
-    final ItemNode<K,V> node = ItemNode.search(b1, k, old);
+    //final ItemNode<K,V> node = ItemNode.search(b1, k, old);
 
-    if (node != null)
-      return node.v;
-    else {
-      synchronized(locks[stripe]){
-        buckets[hash] = new ItemNode<K,V>(k, v, b1);
-        sizes[stripe]++;
-        return null;
-      }
-    }
+    //if (node != null)
+    //  return node.v;
+    //else {
+    //  synchronized(locks[stripe]){
+    //    buckets[hash] = new ItemNode<K,V>(k, v, b1);
+    //    sizes.getAndIncrement(stripe);
+    //    return null;
+    //  }
+    //}
+    return null;
   }
 
   // Remove and return the value

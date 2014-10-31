@@ -1,0 +1,6 @@
+Exercise 9.1
+1) Everything is swell except the test of foreach which only prints out the contents of the hashmap.
+We extend this test to verify the contents for all entries. 
+
+The implementation still passes the test, although we encountered a problem with our remove method. Problem fixed and were on schedule :-)
+ 

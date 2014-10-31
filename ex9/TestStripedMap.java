@@ -182,13 +182,27 @@ public class TestStripedMap {
 					
 					Random rando = new Random();
 					public void run(){
+						int before, after;
+						boolean updated;
 						System.out.println("thread initiated");
 						int nextRando = rando.nextInt(100);
+
+						before = map.size();
 						map.put(nextRando, "The Colonel enjoys his chicken");
-						counter.getAndAdd(nextRando);
+						after = map.size();
+						updated = after > before;
+						if(updated)
+							counter.addAndGet(nextRando);
+
 						nextRando = rando.nextInt(100);
+						before = map.size();
 						map.putIfAbsent(nextRando, "Babe must be fed");
-						counter.getAndAdd(nextRando);
+						after = map.size();
+						updated = after > before;
+
+						if(updated)
+							counter.addAndGet(nextRando);
+
 						map.containsKey(rando.nextInt(100));
 						nextRando = rando.nextInt(100);
 						String node = map.remove(nextRando);
@@ -208,7 +222,7 @@ public class TestStripedMap {
 				}
 			}catch(Exception e){System.out.println("Arrgg there be an error aboard yer vessel!");}
 		final AtomicInteger finalCount = new AtomicInteger(0);
-		map.forEach((K,V) -> finalCount.getAndIncrement());
+		map.forEach((K,V) -> finalCount.getAndAdd(K));
 		System.out.println("Map size: "+ map.size());
 		System.out.println("Keys value: "+ finalCount.get());
 		System.out.println("Counter Value: "+ counter.get());
@@ -221,8 +235,9 @@ public class TestStripedMap {
     //testMap(new SynchronizedMap<Integer,String>(25));
   //  testMap(new StripedMap<Integer,String>(25, 5));
     //testMap(new StripedWriteMap<Integer,String>(25, 5));
-    testConcurrent(new StripedWriteMap<Integer,String>(77, 7));
+    //testConcurrent(new StripedWriteMap<Integer,String>(77, 7));
     //testMap(new WrapConcurrentHashMap<Integer,String>());
+    testConcurrent(new WrapConcurrentHashMap<Integer,String>());
   }
 
   // --- Benchmarking infrastructure ---
@@ -773,11 +788,10 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
   // Iterate over the hashmap's entries one stripe at a time.  
   public void forEach(Consumer<K,V> consumer) {
 	  final ItemNode<K,V>[] bs = buckets;
-	    for (int i = 0; i < lockCount ; i++){
-	        int hash = i % buckets.length;
+	    for (int i = 0; i < bs.length ; i++){
+	     	int hash = i % lockCount;
 	        //the get, makes previous writes visible  
-			for (int j = 0; j < lockCount ; j++)
-	    		sizes.geti(i);
+	    	sizes.get(hash);
 
 	        ItemNode<K,V> node = bs[hash];
 	        while (node != null) {

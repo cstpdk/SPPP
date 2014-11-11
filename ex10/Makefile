@@ -12,7 +12,7 @@ default: run-10.1
 %.class: $(SOURCES)
 	javac $(@:.class=.java)
 
-run-10.1: TestStmHistogram.class
+run-10.2: TestStmHistogram.class
 	$(JAVA) -ea TestStmHistogram
 
 clean:

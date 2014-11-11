@@ -1,5 +1,5 @@
 SHELL := bash
-JAVA := java -cp `pwd`
+JAVA := java -cp multiverse-core-0.7.0.jar:.
 
 SOURCES := $(shell find . -name "*.java")
 
@@ -10,13 +10,13 @@ CLASSES := $(SOURCES:.java=.class)
 default: run-10.3
 
 %.class: $(SOURCES)
-	javac $(@:.class=.java)
+	javac -cp multiverse-core-0.7.0.jar stm/TestStmHistogram.java
 
-run-10.2: $(CLASSES)
-	$(JAVA) -ea TestStmHistogram
+run-10.2: TestStmHistogram.class
+	$(JAVA) TestStmHistogram
 
 run-10.3: $(CLASSES)
-	$(JAVA) -ea TestStmMap
+	$(JAVA) TestStmMap
 
 clean:
 	rm *.class

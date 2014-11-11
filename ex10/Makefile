@@ -10,10 +10,10 @@ CLASSES := $(SOURCES:.java=.class)
 default: run-10.1
 
 %.class: $(SOURCES)
-	javac $(@:.class=.java)
+	$ javac -cp ~/lib/multiverse-core-0.7.0.jar stm/TestStmHistogram.java
 
 run-10.1: TestStmHistogram.class
-	$(JAVA) -ea TestStmHistogram
+	$ java -cp ~/lib/multiverse-core-0.7.0.jar:. stm/TestStmHistogram
 
 clean:
 	rm -f *.class

@@ -12,7 +12,7 @@ default: run-10.1
 %.class: $(SOURCES)
 	$ javac -cp ~/lib/multiverse-core-0.7.0.jar stm/TestStmHistogram.java
 
-run-10.1: TestStmHistogram.class
+run-10.2: TestStmHistogram.class
 	$ java -cp ~/lib/multiverse-core-0.7.0.jar:. stm/TestStmHistogram
 
 clean:

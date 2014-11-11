@@ -7,13 +7,16 @@ CLASSES := $(SOURCES:.java=.class)
 
 .PHONY: all-classes
 
-default: run-10.1
+default: run-10.3
 
 %.class: $(SOURCES)
 	javac $(@:.class=.java)
 
-run-10.2: TestStmHistogram.class
+run-10.2: $(CLASSES)
 	$(JAVA) -ea TestStmHistogram
 
+run-10.3: $(CLASSES)
+	$(JAVA) -ea TestStmMap
+
 clean:
-	rm -f *.class
+	rm *.class

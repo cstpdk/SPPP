@@ -76,7 +76,7 @@ public class TestStmMap {
   }
 
   // Very basic sequential functional test of a hash map.  You must
-  // run with assertions enabled for this to work, as in 
+  // run with assertions enabled for this to work, as in
   //   java -ea TestStmMap
   private static void testMap(final OurMap<Integer, String> map) {
     System.out.printf("%n%s%n", map.getClass());
@@ -224,7 +224,14 @@ class StmMap<K,V> implements OurMap<K,V> {
 
   // Return value v associated with key k, or null
   public V get(K k) {
-    throw new RuntimeException("Not implemented");
+	atomic(()-> {
+		final int h = getHash(k), hash = h % buckets.length;
+		ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
+		if (node != null)
+			return node.v;
+		else
+			return null;
+	});
   }
 
   public int size() {
@@ -253,6 +260,7 @@ class StmMap<K,V> implements OurMap<K,V> {
   // suspicious.
   public void forEach(Consumer<K,V> consumer) {
     throw new RuntimeException("Not implemented");
+
   }
 
   // public void reallocateBuckets() { 

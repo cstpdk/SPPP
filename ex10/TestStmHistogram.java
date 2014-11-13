@@ -29,7 +29,7 @@ class TestStmHistogram {
     final Histogram histogram = new StmHistogram(30);
     final int range = 4_000_000;
     final int threadCount = 10, perThread = range / threadCount;
-    final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 2),
+    final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1),
       stopBarrier = startBarrier;
     final Thread[] threads = new Thread[threadCount];
     for (int t=0; t<threadCount; t++) {
@@ -47,17 +47,23 @@ class TestStmHistogram {
             });
         threads[t].start();
     }
-    //Thread here that creates a histogram and occasionally transfers all values to it.
-    Thread t = new Thread(()->{
 
-    });
+
 
 
 
 
     try { startBarrier.await(); } catch (Exception exn) { }
+    //We let the Main Thread here create a histogram and occasionally transfers all values to it.
+    Histogram total = new StmHistogram(histogram.getSpan());
+    for(int i = 0; i < 200; i++){
+      total.transferBins(histogram);
+      try{
+        Thread.sleep(30);
+      } catch(InterruptedException e){ System.out.println(e); return;}
+    }
     try { stopBarrier.await(); } catch (Exception exn) { }
-    dump(histogram);
+    dump(total);
   }
 
   public static void dump(Histogram histogram) {
@@ -104,7 +110,7 @@ class StmHistogram implements Histogram {
   }
 
   public void increment(int bin) {
-    atomic(()->{counts[bin].atomicGetAndIncrement(1);});
+    atomic(()->{counts[bin].increment();});
   }
 
   public int getCount(int bin) {
@@ -126,7 +132,7 @@ class StmHistogram implements Histogram {
 
   public int getAndClear(int bin) {
     return atomic(()->{
-      int i = counts[bin].get();
+      int i = getCount(bin);
       counts[bin] = newTxnInteger(0);
       return i;
     });
@@ -134,13 +140,17 @@ class StmHistogram implements Histogram {
 
   public void transferBins(Histogram hist) {
     //incompatiable histograms, we opt to return.
-    if(hist.getSpan() != counts.length)
-      return;
+    if(hist.getSpan() != counts.length){
+        System.out.println("incompatible lengths of histograms");
+    }
     for(int i = 0; i < counts.length; i++){
       final int value = i;
       atomic(()->{
-        for(int j = 0; j < getAndClear(value); j++)
-          hist.increment(value);
+        int limit = hist.getAndClear(value);
+        for(int j = 0; j < limit; j++){
+          increment(value);
+        }
+
       });
     }
   }

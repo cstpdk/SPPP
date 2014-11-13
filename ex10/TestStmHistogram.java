@@ -63,6 +63,7 @@ class TestStmHistogram {
       } catch(InterruptedException e){ System.out.println(e); return;}
     }
     try { stopBarrier.await(); } catch (Exception exn) { }
+    total.transferBins(total);
     dump(total);
   }
 

@@ -2,6 +2,34 @@ Exercise 10.2
 2) Does it produce the correct result with your histogram implementation?
 It runs and it produces the correct result.
 
+
+6) At the end histogram’s counts should be all zero, and total’s counts should
+be what histogram’s used to be, regardless when and how many times transferBins
+has been called. Is this the case?
+It is the case yes, all values are trasfered to the 'total' histogram.
+
+7) What effect would you expect total.transferBins(total) to have?
+We would expect that all values are removed and added again in one atomic
+operation. Calling total.transferBins(total); just before we dump the histogram
+should make no difference.
+
+What effect does it have in your implementation? Explain.
+It behaves as expected. The remove and increment operations are handled
+as an atomic operation: (bin is the bin number here)
+atomic(()->{
+  int limit = hist.getAndClear(bin);
+  for(int j = 0; j < limit; j++){
+    increment(bin);
+  }
+
+});
+So within the closure of the atomic operation the value of each bin is removed
+with getAndClear(bin) and the corresponding bin is incremented exactly as
+many times as the value removed. Its like going into a bank, withdrawing 15kr
+and depositing 15 kr. Once you exit the bank (or like here exit the atomic()
+operation) you haven't changed the amount on your account. 
+
+
 Exercise 10.3
 
 3) I have chosen the easy way out and wrapped the entirety ofthe message body

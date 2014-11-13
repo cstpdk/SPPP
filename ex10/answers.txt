@@ -1,0 +1,7 @@
+Exercise 10.2
+2) Does it produce the correct result with your histogram implementation?
+It runs and it produces the correct result. 
+
+
+
+

@@ -7,10 +7,10 @@ CLASSES := $(SOURCES:.java=.class)
 
 .PHONY: all-classes
 
-default: run-10.3
+default: run-10.2
 
 %.class: $(SOURCES)
-	javac -cp multiverse-core-0.7.0.jar stm/TestStmHistogram.java
+	javac -cp multiverse-core-0.7.0.jar TestStmHistogram.java
 
 run-10.2: TestStmHistogram.class
 	$(JAVA) TestStmHistogram

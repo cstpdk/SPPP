@@ -250,13 +250,14 @@ class StmMap<K,V> implements OurMap<K,V> {
       boolean found = ItemNode.search(bs[hash].get(), k, old);
       if (found) {
         V prev = old.get();
+        bs[hash].set(ItemNode.delete(bs[hash].get(),k,old));
         ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
-        bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
+        bs[hash].set(iNode);
         return prev;
       } else {
         count.increment();
         ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
-        bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
+        bs[hash].set(iNode);
         return null;
       }
     });
@@ -289,7 +290,11 @@ class StmMap<K,V> implements OurMap<K,V> {
       ItemNode<K,V> prev = bs[hash].get();
       ItemNode<K,V> newNode = ItemNode.delete(prev,k,old);
 
-      bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(newNode);
+      bs[hash].set(newNode);
+
+      if(prev!=null)
+        count.decrement();
+
       return old.get();
     });
     //if (prev == null)

@@ -192,6 +192,7 @@ interface OurMap<K,V> {
 
 class StmMap<K,V> implements OurMap<K,V> {
   private final TxnRef<TxnRef<ItemNode<K,V>>[]> buckets;
+  private TxnInteger count = StmUtils.newTxnInteger();
 
   public StmMap(int bucketCount) {
     final TxnRef<ItemNode<K,V>>[] buckets = makeBuckets(bucketCount);
@@ -224,80 +225,91 @@ class StmMap<K,V> implements OurMap<K,V> {
 
   // Return value v associated with key k, or null
   public V get(K k) {
-	return atomic(()-> {
-		final Holder<V> old = new Holder<V>();
-		final int h = getHash(k), hash = h % buckets.get().length;
-		final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
-		boolean found = ItemNode.search(bs[hash].get(), k,old);
-		if (found)
-			return old.get();
-		else
-			return null;
-	});
+    return atomic(()-> {
+      final Holder<V> old = new Holder<V>();
+      final int h = getHash(k), hash = h % buckets.get().length;
+      final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
+      boolean found = ItemNode.search(bs[hash].get(), k,old);
+      if (found)
+        return old.get();
+      else
+        return null;
+    });
   }
 
   public int size() {
-    throw new RuntimeException("Not implemented");
+    return atomic(()-> { return count.get(); } );
   }
 
   // Put v at key k, or update if already present.
   public V put(K k, V v) {
-	final Holder<V> old = new Holder<V>();
-	return atomic(()->{
-		final int h = getHash(k), hash = h % buckets.get().length;
-		final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
-		boolean found = ItemNode.search(bs[hash].get(), k, old);
-		if (found) {
-			V prev = old.get();
-			old.set(v);
-			return prev;
-		} else {
-			ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
-			bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
-			return null;
-		}
-	});
+    final Holder<V> old = new Holder<V>();
+    return atomic(()->{
+      final int h = getHash(k), hash = h % buckets.get().length;
+      final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
+      boolean found = ItemNode.search(bs[hash].get(), k, old);
+      if (found) {
+        V prev = old.get();
+        ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
+        bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
+        return prev;
+      } else {
+        count.increment();
+        ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
+        bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
+        return null;
+      }
+    });
   }
 
   // Put v at key k only if absent.
   public V putIfAbsent(K k, V v) {
-	final Holder<V> old = new Holder<V>();
-	return atomic(()->{
-		final int h = getHash(k), hash = h % buckets.get().length;
-		final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
-		boolean found = ItemNode.search(bs[hash].get(), k, old);
-		if (found) {
-			return old.get();
-		} else {
-			ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
-			bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
-			return null;
-		}
-	});
+    final Holder<V> old = new Holder<V>();
+    return atomic(()-> {
+      final int h = getHash(k), hash = h % buckets.get().length;
+      final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
+      boolean found = ItemNode.search(bs[hash].get(), k, old);
+      if (found) {
+        return old.get();
+      } else {
+        count.increment();
+        ItemNode<K,V> iNode = new ItemNode<K,V>(k, v, bs[hash].get());
+        bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(iNode);
+        return null;
+      }
+    });
   }
 
   // Remove and return the value at key k if any, else return null
   public V remove(K k) {
-	final int h = getHash(k), hash = h % buckets.get().length;
-	final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
-	ItemNode<K,V> prev = bs[hash].get();
-	if (prev == null)
-		return null;
-	else if (k.equals(prev.k)) {        // Delete first ItemNode
-		V old = prev.v;
-		buckets[hash] = prev.next;
-		return old;
-	} else {                            // Search later ItemNodes
-		while (prev.next != null && !k.equals(prev.next.k))
-		prev = prev.next;
-		// Now prev.next == null || k.equals(prev.next.k)
-		if (prev.next != null) {  // Delete ItemNode prev.next
-			V old = prev.next.v;
-			prev.next = prev.next.next;
-			return old;
-	} else
-		return null;
-    }
+    final Holder<V> old = new Holder<V>();
+    return atomic(() -> {
+      final int h = getHash(k), hash = h % buckets.get().length;
+      final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
+      ItemNode<K,V> prev = bs[hash].get();
+      ItemNode<K,V> newNode = ItemNode.delete(prev,k,old);
+
+      bs[hash] = StmUtils.<ItemNode<K,V>>newTxnRef(newNode);
+      return old.get();
+    });
+    //if (prev == null)
+    //  return null;
+    //else if (k.equals(prev.k)) {        // Delete first ItemNode
+    //  V old = prev.v;
+    //  buckets[hash] = prev.next;
+    //  return old;
+    //} else {                            // Search later ItemNodes
+    //  while (prev.next != null && !k.equals(prev.next.k))
+    //    prev = prev.next;
+    //  // Now prev.next == null || k.equals(prev.next.k)
+    //  ItemNode
+    //  if (prev.next != null) {  // Delete ItemNode prev.next
+    //    V old = prev.next.v;
+    //    prev.next = prev.next.next;
+    //    return old;
+    //  } else
+    //    return null;
+    //}
   }
 
   // Iterate over the hashmap's entries one bucket at a time.  Since a
@@ -306,14 +318,16 @@ class StmMap<K,V> implements OurMap<K,V> {
   // This is good, because calling a consumer inside an atomic seems
   // suspicious.
   public void forEach(Consumer<K,V> consumer) {
-	final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
-	for (int i = 0; i < bs.length ; i++){
-		ItemNode<K,V> node = bs[i].get();
-		while (node != null) {
-			consumer.accept(node.k, node.v);
-			node = node.next;
-		}
-	}
+    atomic(() -> {
+      final TxnRef<ItemNode<K,V>>[] bs = buckets.get();
+      for (int i = 0; i < bs.length ; i++){
+        ItemNode<K,V> node = bs[i].get();
+        while (node != null) {
+          consumer.accept(node.k, node.v);
+          node = node.next;
+        }
+      }
+    });
   }
 
   // public void reallocateBuckets() { 
@@ -324,7 +338,7 @@ class StmMap<K,V> implements OurMap<K,V> {
     private final K k;
     private final V v;
     private final ItemNode<K,V> next;
-    
+
     public ItemNode(K k, V v, ItemNode<K,V> next) {
       this.k = k;
       this.v = v;
@@ -343,7 +357,7 @@ class StmMap<K,V> implements OurMap<K,V> {
           node = node.next;
       return false;
     }
-    
+
     public static <K,V> ItemNode<K,V> delete(ItemNode<K,V> node, K k, Holder<V> old) {
       if (node == null) 
         return null; 
@@ -374,3 +388,5 @@ class StmMap<K,V> implements OurMap<K,V> {
     }
   }
 }
+
+// vim: et:st=2:ts=2:sts=2:sw=2

@@ -29,7 +29,7 @@ class TestStmHistogram {
     final Histogram histogram = new StmHistogram(30);
     final int range = 4_000_000;
     final int threadCount = 10, perThread = range / threadCount;
-    final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1),
+    final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 2),
       stopBarrier = startBarrier;
     final Thread[] threads = new Thread[threadCount];
     for (int t=0; t<threadCount; t++) {
@@ -47,6 +47,14 @@ class TestStmHistogram {
             });
         threads[t].start();
     }
+    //Thread here that creates a histogram and occasionally transfers all values to it.
+    Thread t = new Thread(()->{
+
+    });
+
+
+
+
     try { startBarrier.await(); } catch (Exception exn) { }
     try { stopBarrier.await(); } catch (Exception exn) { }
     dump(histogram);
@@ -109,8 +117,8 @@ class StmHistogram implements Histogram {
 
   public int[] getBins() {
     return atomic(() -> {
-      int[] arr = new int[count.length];
-      for(int i = 0; i < count.length; i++)
+      int[] arr = new int[counts.length];
+      for(int i = 0; i < counts.length; i++)
         arr[i] = counts[i].get();
       return arr;
     });
@@ -126,12 +134,14 @@ class StmHistogram implements Histogram {
 
   public void transferBins(Histogram hist) {
     //incompatiable histograms, we opt to return.
-    if(hist.length != counts.length)
+    if(hist.getSpan() != counts.length)
       return;
-    atomic(()->{
-      for(int i = 0; i < counts; i++){
-        hist[i] = getAndClear(i);
-      }
-    });
+    for(int i = 0; i < counts.length; i++){
+      final int value = i;
+      atomic(()->{
+        for(int j = 0; j < getAndClear(value); j++)
+          hist.increment(value);
+      });
+    }
   }
 }

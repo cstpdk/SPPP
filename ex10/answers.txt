@@ -1,7 +1,23 @@
 Exercise 10.2
 2) Does it produce the correct result with your histogram implementation?
-It runs and it produces the correct result. 
+It runs and it produces the correct result.
 
+Exercise 10.3
 
+3) I have chosen the easy way out and wrapped the entirety ofthe message body
+in a transaction. I trust the multiverse library to keep it's promise of
+atomomicity and for this reason I trust the implementation.
 
-
+5) As described in the problem formulation it is a bit of balancing act to
+implement reallocate bucket method without slowing the map implementation to a
+crawl, og breaking the concurrency guarentees of the implementation. The
+overlying problem is that since all buckets are affected in a reallocate
+method, any ongoing work done in a put* or remove operation will break the
+transaction. It doesn't make sense to only reallocate some of the buckets, as
+such, we have to prevent the put*/remove operations from happening. One
+approach to doing this is to make us of the retry() statement and an explicit
+lock. The explicit lock would be some form of Txn boolean, which will be true
+when reallocate is called. All the "dangerous" operations will then check this
+boolean before doing any work, and if it's true, calle the retry() method. The
+reallocate method will, in the same vein, have to respect ongoing transactions
+before locking.

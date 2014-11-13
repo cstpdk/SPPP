@@ -2,7 +2,7 @@ exercises := $(wildcard ex*)
 
 .PHONY: $(exercises)
 
-default: ex8
+default: ex10
 
 build:
 	docker build -t sppp .

@@ -331,7 +331,7 @@ class SynchronizedMap<K,V> implements OurMap<K,V>  {
   public synchronized V get(K k) {
     final int h = getHash(k), hash = h % buckets.length;
     ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
-    if (node != null) 
+    if (node != null)
       return node.v;
     else
       return null;

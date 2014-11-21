@@ -54,17 +54,9 @@ class TestStmHistogram {
 
 
     try { startBarrier.await(); } catch (Exception exn) { }
-    //We let the Main Thread here create a histogram and occasionally transfers all values to it.
-    Histogram total = new StmHistogram(histogram.getSpan());
-    for(int i = 0; i < 200; i++){
-      total.transferBins(histogram);
-      try{
-        Thread.sleep(30);
-      } catch(InterruptedException e){ System.out.println(e); return;}
-    }
+      Timer t = new Timer();
     try { stopBarrier.await(); } catch (Exception exn) { }
-    total.transferBins(total);
-    dump(total);
+      System.out.println("Time: "+t.check());
   }
 
   public static void dump(Histogram histogram) {

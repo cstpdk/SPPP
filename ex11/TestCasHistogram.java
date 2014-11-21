@@ -7,26 +7,17 @@
 //   javac -cp ~/lib/multiverse-core-0.7.0.jar TestStmHistogram.java
 //   java -cp ~/lib/multiverse-core-0.7.0.jar:. TestStmHistogram
 
-// For the Multiverse library:
-import org.multiverse.api.references.*;
-import static org.multiverse.api.StmUtils.*;
-
-// Multiverse locking:
-import org.multiverse.api.LockMode;
-import org.multiverse.api.Txn;
-import org.multiverse.api.callables.TxnVoidCallable;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CyclicBarrier;
 
-class TestStmHistogram {
+class TestCasHistogram {
   public static void main(String[] args) {
-    countPrimeFactorsWithStmHistogram();
+    countPrimeFactorsWithCasHistogram();
   }
 
-  private static void countPrimeFactorsWithStmHistogram() {
-    final Histogram histogram = new StmHistogram(30);
+  private static void countPrimeFactorsWithCasHistogram() {
+    final Histogram histogram = new CasHistogram(30);
     final int range = 4_000_000;
     final int threadCount = 10, perThread = range / threadCount;
     final CyclicBarrier startBarrier = new CyclicBarrier(threadCount + 1),
@@ -48,15 +39,10 @@ class TestStmHistogram {
         threads[t].start();
     }
 
-
-
-
-
-
     try { startBarrier.await(); } catch (Exception exn) { }
     Timer t = new Timer();
     //We let the Main Thread here create a histogram and occasionally transfers all values to it.
-    Histogram total = new StmHistogram(histogram.getSpan());
+    Histogram total = new CasHistogram(histogram.getSpan());
     for(int i = 0; i < 200; i++){
       total.transferBins(histogram);
       try{
@@ -102,22 +88,25 @@ interface Histogram {
   void transferBins(Histogram hist);
 }
 
-class StmHistogram implements Histogram {
-  private final TxnInteger[] counts;
+class CasHistogram implements Histogram {
+  private final AtomicInteger[] counts;
 
-  public StmHistogram(int span) {
-    counts = new TxnInteger[span];
+  public CasHistogram(int span) {
+    counts = new AtomicInteger[span];
     for(int i = 0; i < counts.length; i++){
-      counts[i] = newTxnInteger(0);
+      counts[i] = new AtomicInteger(0);
     }
   }
 
   public void increment(int bin) {
-    atomic(()->{counts[bin].increment();});
+    int old = counts[bin].get();
+    do{
+      old = counts[bin].get();
+    } while(!counts[bin].compareAndSet(old,old+1));
   }
 
   public int getCount(int bin) {
-    return atomic(()->{  return counts[bin].get();} );
+    return counts[bin].get();
   }
 
   public int getSpan() {
@@ -125,36 +114,32 @@ class StmHistogram implements Histogram {
   }
 
   public int[] getBins() {
-    return atomic(() -> {
-      int[] arr = new int[counts.length];
-      for(int i = 0; i < counts.length; i++)
-        arr[i] = counts[i].get();
-      return arr;
-    });
+    int[] arr = new int[counts.length];
+    for(int i = 0; i < counts.length; i++)
+      arr[i] = counts[i].get();
+    return arr;
   }
 
   public int getAndClear(int bin) {
-    return atomic(()->{
-      int i = getCount(bin);
-      counts[bin] = newTxnInteger(0);
-      return i;
-    });
+    int old = counts[bin].get();
+    do{
+      old = counts[bin].get();
+    } while(!counts[bin].compareAndSet(old,0));
+    return old;
   }
 
   public void transferBins(Histogram hist) {
-    //incompatiable histograms, we opt to return.
     if(hist.getSpan() != counts.length){
         System.out.println("incompatible lengths of histograms");
     }
     for(int i = 0; i < counts.length; i++){
       final int value = i;
-      atomic(()->{
-        int limit = hist.getAndClear(value);
-        for(int j = 0; j < limit; j++){
-          increment(value);
-        }
-
-      });
+      int limit = hist.getAndClear(value);
+      for(int j = 0; j < limit; j++){
+        increment(value);
+      }
     }
   }
 }
+
+// vim: et:st=2:ts=2:sts=2:sw=2

@@ -197,4 +197,20 @@ class MSQueueRefl<T> implements UnboundedQueue<T> {
       this.next = next;
     }
   }
+
+  	
+  private static void sequentialTest(BoundedQueue<Integer> bq) throws Exception {
+    System.out.printf("%nSequential test: %s", bq.getClass());    
+    assertTrue(bq.isEmpty());
+    assertTrue(!bq.isFull());
+    bq.put(7); bq.put(9); bq.put(13); 
+    assertTrue(!bq.isEmpty());
+    assertTrue(bq.isFull());
+    assertEquals(bq.take(), 7);
+    assertEquals(bq.take(), 9);
+    assertEquals(bq.take(), 13);
+    assertTrue(bq.isEmpty());
+    assertTrue(!bq.isFull());
+    System.out.println("... passed");
+  }
 }

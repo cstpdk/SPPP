@@ -1,0 +1,74 @@
+12.1
+3) Inject some faults in the MSQueue implementation and see whether the test
+detects them. Describe the faults and whether the test detects them, and if it
+does detect them, how it fails.
+
+ENQUEUE ERRORS INJECTED:
+We removed the check in enque (E9) whether a new tail has been added while trying to set
+last.next. This whoould give an error, that is hard to produce.
+
+Node<T> last = tail.get(), next = last.next;
+if (true /*last == tail.get()*/) {}
+
+Result: Our test does not capture/reproduce an error.
+
+We injected an error bypassing the check /** at enemy headquarters.
+Seemed to be a standard operation at the time.
+Little did we know... someone was at our tail.. not the tail in the test..
+another tail. you know... the furry kind you find on animals.
+(If you find animals)
+No I was talking about the roadkills you encounter at highways.
+Animals such as foxes, deers, rats, turtles and canary birds.
+These kinds of furry tails. **/
+Errh.. back to the test.
+
+We injected an error bypassing the check in enqueue for the next value being null.
+This error could potentially overwrite a value at the tail if the tail has been
+updated bu another thread.
+Again this requires a certain kind of interleaving operations to occur.
+
+Node<T> last = tail.get(), next = last.next;
+if (last == tail.get()) {
+  if (true /*next == null*/)  { <-------- ERROR HERE
+    // In quiescent state, try inserting new node
+    if (nextUpdater.compareAndSet(last, next, node)) {
+
+Result: Our tests did not capture/reproduce an error.
+
+DEQUEUE ERRORS INJECTED:
+
+Basically we injected the same two errors in the dequeue method. (Not simultaniesly).
+These checks are meant to verify that another thread has not altered the queue while
+we tried to update it making the head point to wrong nodes.
+As for the enqueue methods this requires certain interleavings to produce errors.
+
+Node<T> first = head.get(), last = tail.get(), next = first.next;
+if (true /*first == head.get()*/) {  <------- ERROR HERE
+  if (true /*first == last*/) { <--------- AND HERE
+    if (next == null)
+      return null;
+Result: Our tests did not capture/reproduce the error.
+
+12.2
+1) The checks performed at source lines E7 and D5 look reasonable enough, but are
+they really useful? For instance, it seems that right after (last == tail.get())
+was successfully evaluated to true at E7, another thread could modify tail.
+Hence it seems that the check does not substantially contribute to the
+correctness of the data structure.
+
+These check (although not caught by our tests) are quite reasonable.
+They prevent situations where the head and tail are overwritten by other threads.
+See figure1.jpg for an intermistic drawing of a situation where this might
+occur.
+
+2) Run the sequential and concurrent tests from Exercise12.1 on a version of the
+MSQueueclass in which you have deleted the check at line E7 in the source code.
+Does it pass the test?
+
+Way ahead of you.. See question 12.1 3).
+
+3) Run the sequential and concurrent tests from Exercise12.1 on a version of the
+MSQueueclass in which you have deleted the check at line D7 in the source code.
+Does it pass the test?
+
+Way ahead of you.. See question 12.1 3) part two.

@@ -10,8 +10,8 @@ default: run-12.1
 %.class: %.java
 	javac $(@:.class=.java)
 
-run-12.1:
-	$(JAVA)
+run-12.1: $(CLASSES)
+	$(JAVA) TestMSQueue
 
 clean:
 	rm *.class

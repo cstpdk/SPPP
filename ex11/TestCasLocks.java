@@ -494,3 +494,39 @@ class MyReentrantLock {
     throw new RuntimeException("Not lock holder");
   }
 }
+
+class SimpleRWTryLock {
+  private static abstract class Holders {}
+
+  private static class ReaderList extends Holders {
+    private final Thread thread;
+    private final ReaderList next;
+    public ReaderList(Thread thread){
+      this.thread=thread;
+      this.next=null;
+    }
+  }
+
+  private static class Writer extends Holders {
+    public final Thread thread;
+    public Writer(Thread thread){
+      this.thread=thread;
+    }
+  }
+
+  private final AtomicReference<Holders> holders = new AtomicReference();
+
+  public SimpleRWTryLock(){ holders.set(null); }
+
+  public boolean readerTryLock() { return false; }
+  public void readerUnlock() {}
+  public boolean writerTryLock() {
+    return holders.compareAndSet(null, new Writer(Thread.currentThread()));
+  }
+  public void writerUnlock() {
+    if(!holders.compareAndSet(new Writer(Thread.currentThread()),null))
+      throw new RuntimeException("I HAVE NO LOCKS, STOP EXPECTING ME TO HAVE LOCKS, SOCIETY");
+  }
+}
+
+// vim: et:st=2:ts=2:sts=2:sw=2

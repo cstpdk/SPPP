@@ -5,27 +5,17 @@ does detect them, how it fails.
 
 ENQUEUE ERRORS INJECTED:
 We removed the check in enque (E9) whether a new tail has been added while trying to set
-last.next. This whoould give an error, that is hard to produce.
+last.next. This might give an error, that is hard to produce.
 
 Node<T> last = tail.get(), next = last.next;
 if (true /*last == tail.get()*/) {}
 
 Result: Our test does not capture/reproduce an error.
 
-We injected an error bypassing the check /** at enemy headquarters.
-Seemed to be a standard operation at the time.
-Little did we know... someone was at our tail.. not the tail in the test..
-another tail. you know... the furry kind you find on animals.
-(If you find animals)
-No I was talking about the roadkills you encounter at highways.
-Animals such as foxes, deers, rats, turtles and canary birds.
-These kinds of furry tails. **/
-Errh.. back to the test.
-
-We injected an error bypassing the check in enqueue for the next value being null.
-This error could potentially overwrite a value at the tail if the tail has been
-updated bu another thread.
-Again this requires a certain kind of interleaving operations to occur.
+We injected an error bypassing the check for the next value being null.
+This error looks like it could possibly overwrite a value at the tail
+if the tail has been updated bu another interleaving thread.
+Again this might require a certain kind of interleaving operations to occur.
 
 Node<T> last = tail.get(), next = last.next;
 if (last == tail.get()) {
@@ -38,9 +28,7 @@ Result: Our tests did not capture/reproduce an error.
 DEQUEUE ERRORS INJECTED:
 
 Basically we injected the same two errors in the dequeue method. (Not simultaniesly).
-These checks are meant to verify that another thread has not altered the queue while
-we tried to update it making the head point to wrong nodes.
-As for the enqueue methods this requires certain interleavings to produce errors.
+As for the enqueue methods this might require certain interleavings to produce errors.
 
 Node<T> first = head.get(), last = tail.get(), next = first.next;
 if (true /*first == head.get()*/) {  <------- ERROR HERE
@@ -56,9 +44,15 @@ was successfully evaluated to true at E7, another thread could modify tail.
 Hence it seems that the check does not substantially contribute to the
 correctness of the data structure.
 
-These check (although not caught by our tests) are quite reasonable.
-They prevent situations where the head and tail are overwritten by other threads.
-See figure1.jpg for an intermistic drawing of a situation where this might
+These checks (who removed did not alter any test results) from a thread safety
+perspective are not reasonable.
+They look as if they're ment to prevent situations where the head and tail
+are overwritten by other threads. But these checks dont protect the class, as
+the atomicity lies in the CompareAndSet method which ensures the safety.
+Without the atomicity of CompareAndSet, theres plenty of room for
+interleaving operations making a mess of the queue.
+See figure1.jpg for an intermistic drawing
+of a situation where this might
 occur.
 
 2) Run the sequential and concurrent tests from Exercise12.1 on a version of the
@@ -72,3 +66,16 @@ MSQueueclass in which you have deleted the check at line D7 in the source code.
 Does it pass the test?
 
 Way ahead of you.. See question 12.1 3) part two.
+
+4) If the checks at lines E7 and D5 are indeed unnecessary for correctness,
+what other reasons could there be to include them in the code?
+How would you test your hypotheses about such reasons?
+
+There's some overhead in proceeding past E7 and D5 if the last element
+has been changed. So to up the performance these checks are introduced.
+This can be tested with performance measurements (like your timing framework).
+
+5) Describe and conduct an experiment to cast some light on the role of one
+of E7 and D5.
+
+See answer to 12.3 4) for test and results.

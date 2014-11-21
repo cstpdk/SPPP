@@ -18,6 +18,7 @@ public class TestMSQueue {
     MSQueue<Integer> q = new MSQueue<Integer>();
     sequentialTest(q);
     parallelTest(q);
+    performanceTest(q);
   }
 
   public static void assertEquals(int x, int y) throws Exception {
@@ -125,6 +126,18 @@ public class TestMSQueue {
         }
       }
     }
+  }
+
+  private static void performanceTest(MSQueue<Integer> msq) throws Exception {
+    System.out.printf("%n Performance test: %s", msq.getClass());
+    final ExecutorService pool = Executors.newCachedThreadPool();
+    PutTakeTest ptt = new PutTakeTest(msq, 4, 100);
+    Timer t = new Timer();
+    for (int i = 0; i < 100 ; i++)
+      ptt.test(pool);
+
+    System.out.printf("Performance %f",t.check());
+    pool.shutdown();
   }
 }
 
@@ -244,7 +257,6 @@ class MSQueue<T> implements UnboundedQueue<T> {
   }
 }
 
-
 // --------------------------------------------------
 // Lock-free queue, using CAS and reflection on field Node.next
 
@@ -321,3 +333,5 @@ class MSQueueRefl<T> implements UnboundedQueue<T> {
 
 
 }
+
+// vim: st=2 sts=2 sw=2 et

@@ -1,3 +1,5 @@
+a) See ABC.png
+b) See ABC.java
 c) If we pass desired state instead of +/- then we communicate with state and
 will probably have intermittent wrong states. Since we're not checking on
 availability of funds in the two accounts the final result should still be the

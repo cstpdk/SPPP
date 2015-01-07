@@ -327,3 +327,4 @@ class IntArrayUtil {
     return true;
   }
 }
+// vim: st=2 sts=2 sw=2 et
